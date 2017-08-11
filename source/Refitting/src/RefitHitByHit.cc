@@ -154,13 +154,27 @@ void RefitHitByHit::processEvent( LCEvent * evt ) {
     EVENT::TrackerHitVec::iterator it = trkHits.begin();
 
     const int nHitsTrack = trkHits.size();
+    int nHitsAdded = 0;
+
     for (int iHit = 0; iHit < _nInitialHits && iHit < nHitsTrack ;++iHit) {
       auto* theHit = trkHits[iHit];
       _encoder->setValue( theHit->getCellID0() ) ;
       const int subdet = (*_encoder)[lcio::LCTrackerCellID::subdet()].value();
       if( subdet > 2 ) break; // only take hits in the vertex barrel or endcap
       marlin_trk->addHit( theHit );
+      nHitsAdded++;
     }
+
+    if(nHitsAdded < 3){
+      streamlog_out( WARNING ) << "Not enough hits in the vertex endcap/barrel, adding all first hits" << std::endl;
+      delete marlin_trk;
+      marlin_trk = _trksystem->createTrack();
+      for (int iHit = 0; iHit < _nInitialHits && iHit < nHitsTrack ;++iHit) {
+        marlin_trk->addHit( trkHits[iHit] );
+      }
+      nHitsAdded++;
+    }
+
     int init_status = FitInit2(track, marlin_trk) ;
 
     if (init_status!=0) {
