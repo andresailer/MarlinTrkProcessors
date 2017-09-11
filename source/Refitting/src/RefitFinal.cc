@@ -158,7 +158,7 @@ void RefitFinal::processEvent(LCEvent *evt) {
 
     const int nHitsTrack = trkHits.size();
 
-    for (int iHit = 0; iHit < nHitsTrack && iHit < nHitsTrack; ++iHit) {
+    for (int iHit = 0; iHit < nHitsTrack; ++iHit) {
       marlin_trk->addHit(trkHits[iHit]);
     }
 
